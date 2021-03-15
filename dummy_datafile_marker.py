@@ -13,7 +13,7 @@
 # ---
 
 # +
-import csv
+import pandas as pd
 import random
 import numpy as np
 
@@ -21,26 +21,24 @@ import numpy as np
 
 file_name_head = "testdata_"
 file_name_end = ""
-file_ext = ".txt"
+file_ext = ".csv"
 
-data_name_head = "data_"
-data_name_end = ""
+column_name_head = "value_"
+column_name_end = ""
 
-value_name_head = "value_"
-value_name_end = ""
+index_name_head = "data_"
+index_name_end = ""
 
 target_name = "target"
 
-index_name = "dataname"
-
-no_files = 1
-rows = 10
-columns = 5
+no_files = 3
+no_indexes = 10
+no_columns = 5
 
 target_val = [0, 1]
-
-random_range = [0, 99]
+random_range = range(0, 100)
 nan_val = range(100, 101)
+
 
 # +
 #Main
@@ -48,42 +46,21 @@ nan_val = range(100, 101)
 for no_file in range(no_files):
     filename = file_name_head + str(no_file + 1) + file_name_end + file_ext
 #     print(filename)
-    f = open(filename, "w")
-    writer = csv.writer(f)
+    column_name_list = [column_name_head + str(i + 1) + column_name_end for i in range(no_columns)]
+#     print(column_name_list)
+    index_name_list = [index_name_head + str(i + 1) + index_name_end for i in range(no_indexes)]
+#     print(index_name_list)
+    df = pd.DataFrame(index=index_name_list, columns=column_name_list)
+#     print(df)
+    for column in column_name_list:
+        df[column] = random.choices(random_range, k=no_indexes)
+#     print(df)
+    for i in nan_val:
+        df = df.replace(i, np.nan)
     
-    header = [index_name]
-    for column in range(columns):
-        valuename = value_name_head + str(column + 1) + value_name_end
-        header.append(valuename)
-        
-    if len(target_val) > 1:
-        header.append(target_name)
-        
-    writer.writerow(header)
+    df[target_name] = random.choices(target_val, k=no_indexes)
     
-    for row in range(rows):
-        data = []
-        dataname = data_name_head + str(row + 1) + data_name_end
-        data.append(dataname)
-        
-        for column in range(columns):
-            random_val = random.randint(random_range[0], random_range[1])
-            if random_val in nan_val:
-                random_val = np.nan
-                
-            print(random_val)
-            data.append(random_val)
-                
-        if len(target_val) > 1:
-            data.append(random.choice(target_val))
-                
-        writer.writerow(data)
-    
-    f.close()
-    
-print("Done")
+    df.to_csv(filename)
 # -
-
-
 
 
